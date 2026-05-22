@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrGBase Maker</title>
+    <link rel="icon" type="image/png" href="https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/drgbase%20icon.png?raw=true">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+        
+        .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
+
+        .nav-active { background-color: #18181b; color: #818cf8; border-right: 3px solid #6366f1; }
+        .nav-inactive { color: #a1a1aa; border-right: 3px solid transparent; }
+        .nav-inactive:hover { background-color: #18181b; color: #e4e4e7; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.2s ease-out forwards; }
+        
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast-anim { animation: slideInRight 0.3s ease-out forwards; }
+
+        .bg-grid-pattern {
+            background-size: 32px 32px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        .input-standard {
+            width: 100%; background-color: #09090b; border: 1px solid #27272a; border-radius: 6px; padding: 0.6rem 0.75rem; 
+            color: #f4f4f5; font-size: 0.875rem; outline: none; transition: border-color 0.15s ease;
+        }
+        .input-standard:focus { border-color: #6366f1; box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2); }
+        .form-label { display: block; font-size: 0.7rem; font-weight: 600; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem; }
+
+        /* 3D Flip Utilities */
+        .perspective { perspective: 1000px; }
+        .transform-style-preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+
+        /* Floating Backgrounds */
+        @keyframes float1 { 0% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(100px, 50px) rotate(5deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
+        @keyframes float2 { 0% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-80px, 90px) rotate(-5deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
+        @keyframes float3 { 0% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(120px, -60px) rotate(10deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
+        
+        .floating-bg { position: absolute; opacity: 0.05; background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 0; filter: grayscale(100%); }
+        .bg-1 { width: 400px; height: 400px; top: 10%; left: 5%; animation: float1 25s infinite ease-in-out; background-image: url('https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/trevor%20image.png?raw=true'); }
+        .bg-2 { width: 350px; height: 350px; top: 50%; right: 10%; animation: float2 30s infinite ease-in-out; background-image: url('https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/norpa%20image.png?raw=true'); }
+        .bg-3 { width: 500px; height: 500px; bottom: -10%; left: 30%; animation: float3 35s infinite ease-in-out; background-image: url('https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/3d%20nextbot%20image.png?raw=true'); }
+    </style>
+</head>
+<body class="bg-[#09090b] text-zinc-200 font-sans h-screen flex flex-col overflow-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
+
+    <!-- v1.0 Easter Egg -->
+    <div class="fixed bottom-3 right-4 z-50 text-zinc-700 font-mono text-[10px] font-bold group perspective cursor-default select-none">
+        <div class="relative transition-transform duration-700 group-hover:rotate-y-180 transform-style-preserve-3d w-10 h-4">
+            <span class="absolute inset-0 backface-hidden flex items-center justify-end">v1.0</span>
+            <span class="absolute inset-0 backface-hidden rotate-y-180 text-red-500 flex items-center justify-end whitespace-nowrap pr-2 w-[300px] -right-[280px]">who is regular joe Shhhh DON'T SAY TO JoElías N1.</span>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="welcome-screen" class="flex-1 flex flex-col w-full h-full relative overflow-y-auto custom-scrollbar">
+        <div class="absolute inset-0 bg-grid-pattern pointer-events-none z-0"></div>
+        <div class="floating-bg bg-1"></div>
+        <div class="floating-bg bg-2"></div>
+        <div class="floating-bg bg-3"></div>
+        
+        <nav class="border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="group relative perspective cursor-pointer w-9 h-9">
+                    <div class="w-full h-full transition-transform duration-700 group-hover:rotate-y-180 transform-style-preserve-3d shadow-lg shadow-indigo-500/20 rounded-md bg-zinc-900 border border-zinc-700">
+                        <img src="https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/drgbase%20icon.png?raw=true" class="w-full h-full object-cover rounded-md backface-hidden absolute inset-0" />
+                        <div class="w-full h-full bg-indigo-600 rounded-md backface-hidden rotate-y-180 absolute inset-0 flex items-center justify-center font-bold text-white text-xs">HI</div>
+                    </div>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-white relative z-10">DrGBase<span class="text-zinc-500 font-normal"> Maker</span></span>
+            </div>
+            <div class="flex items-center gap-4 relative z-10">
+                <button onclick="openSettingsModal()" class="text-zinc-400 hover:text-white px-3 py-2 text-sm font-medium transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Settings
+                </button>
+                <button onclick="openTemplateModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-md font-medium text-sm transition shadow-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Create New NPC
+                </button>
+            </div>
+        </nav>
+
+        <main class="w-full max-w-6xl mx-auto p-6 md:p-8 relative z-10 flex-1 flex flex-col">
+            <div class="bg-zinc-900/90 backdrop-blur-sm border border-zinc-800 p-8 md:p-12 rounded-xl mb-10 shadow-2xl overflow-hidden relative group">
+                <div class="absolute -right-20 -top-20 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl group-hover:bg-indigo-600/20 transition duration-700"></div>
+                <div class="relative z-10 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-6">
+                        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span></span>
+                        v1.0 Production Ready
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Welcome to DrGBase Maker.</h1>
+                    <p class="text-zinc-400 text-base md:text-lg mb-8 leading-relaxed">This web you can build a drgbase npc whitout codes for gmod addon you can make for u self or for your mod and more.</p>
+                    <button onclick="openTemplateModal()" class="bg-white text-zinc-950 hover:bg-zinc-200 px-6 py-3 rounded-lg font-bold transition shadow-lg flex items-center gap-2 inline-flex">
+                        Start Building
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-1">Your Saved NPCs</h2>
+                    <p class="text-sm text-zinc-500">Manage and edit your generated configurations.</p>
+                </div>
+            </div>
+
+            <div id="saves-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-10">
+                <!-- Populated by JS -->
+            </div>
+            
+            <footer class="mt-auto py-6 border-t border-zinc-800/60 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-500 relative z-10">
+                <div>Created by <a href="https://www.youtube.com/@ShonTheGamer" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition font-medium">ShonTheGamer</a></div>
+                <div>Thanks to <a href="https://www.youtube.com/@joeliasn1359" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition font-medium">JoElías N1</a> for template script :P</div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- EDITOR SCREEN -->
+    <div id="editor-screen" class="hidden flex-col h-full w-full bg-[#09090b]">
+        
+        <header class="bg-[#09090b] border-b border-zinc-800 p-3 flex justify-between items-center z-20 shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="goBackToDashboard()" class="text-zinc-400 hover:text-white p-1.5 rounded hover:bg-zinc-800 transition flex items-center gap-2 text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Go Back
+                </button>
+                <div class="h-4 w-px bg-zinc-800"></div>
+                <img src="https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/drgbase%20icon.png?raw=true" class="w-5 h-5 rounded-sm object-cover opacity-80" />
+                <span class="font-medium text-zinc-300 text-sm" id="header-npc-name">Editing NPC...</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <img id="editorTemplateIcon" src="" class="w-8 h-8 rounded-md border border-zinc-700 object-cover shadow-sm bg-zinc-900" title="Current Template">
+                <button onclick="saveCurrentNPC()" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded text-sm font-medium transition flex items-center gap-2 shadow-sm">
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    Save Changes
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- CODE PREVIEW (UP) -->
+            <section class="h-[45%] bg-[#0d1117] border-b border-zinc-800 flex flex-col shrink-0 relative z-10 shadow-md">
+                <div class="bg-[#010409] px-3 pt-2 flex items-end border-b border-zinc-800/80 justify-between">
+                    <div class="bg-[#0d1117] px-4 py-2 rounded-t-md border-t border-l border-r border-zinc-800/80 flex items-center gap-2 mt-1 shadow-[0_-2px_0_#6366f1_inset]">
+                        <svg class="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zM10.82 16h-1.64V8h1.64v8zm3.01 0h-1.64V8h1.64v8z"/></svg>
+                        <span id="filenameDisplay" class="text-xs font-mono text-zinc-300">npc_file.lua</span>
+                    </div>
+                    <div class="flex gap-2 pb-1">
+                        <button onclick="copyCode()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1 rounded border border-zinc-700 flex items-center gap-1.5 text-xs font-medium transition">Copy Code</button>
+                        <button onclick="downloadCode()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded border border-indigo-500/50 flex items-center gap-1.5 text-xs font-medium transition">Download .lua</button>
+                    </div>
+                </div>
+
+                <div class="flex-1 relative">
+                    <textarea id="codePreview" readonly class="absolute inset-0 w-full h-full bg-transparent text-[#e6edf3] font-mono text-[13px] leading-relaxed p-5 outline-none resize-none custom-scrollbar whitespace-pre" spellcheck="false"></textarea>
+                </div>
+            </section>
+
+            <!-- CONFIGURATION (DOWN) -->
+            <section class="h-[55%] flex overflow-hidden">
+                <aside class="w-56 bg-[#09090b] border-r border-zinc-800 flex flex-col shrink-0 py-2 overflow-y-auto custom-scrollbar">
+                    <div class="px-5 py-2"><span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Configuration</span></div>
+                    <nav class="flex flex-col gap-0.5">
+                        <button onclick="switchTab('tab-identity')" id="btn-tab-identity" class="nav-active px-5 py-2.5 text-sm font-medium text-left flex items-center gap-3 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> Identity</button>
+                        <button onclick="switchTab('tab-combat')" id="btn-tab-combat" class="nav-inactive px-5 py-2.5 text-sm font-medium text-left flex items-center gap-3 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg> Combat & Stats</button>
+                        <button onclick="switchTab('tab-animations')" id="btn-tab-animations" class="nav-inactive px-5 py-2.5 text-sm font-medium text-left flex items-center gap-3 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg> Animations</button>
+                        <button onclick="switchTab('tab-sounds')" id="btn-tab-sounds" class="nav-inactive px-5 py-2.5 text-sm font-medium text-left flex items-center gap-3 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5 12h4l4 4V8L9 12z"></path></svg> Sounds</button>
+                        <button onclick="switchTab('tab-abilities')" id="btn-tab-abilities" class="nav-inactive px-5 py-2.5 text-sm font-medium text-left flex items-center gap-3 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Abilities</button>
+                        <button onclick="switchTab('tab-executions')" id="btn-tab-executions" class="nav-inactive px-5 py-2.5 text-sm font-medium text-left flex items-center gap-3 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg> Executions</button>
+                    </nav>
+                </aside>
+
+                <div class="flex-1 overflow-y-auto bg-zinc-950 p-6 custom-scrollbar border-r border-zinc-800">
+                    <div class="max-w-3xl space-y-6 pb-10">
+                        
+                        <!-- Identity Tab -->
+                        <div id="tab-identity" class="block animate-fade">
+                            <div class="mb-4"><h2 class="text-lg font-bold text-white">Identity & Base</h2></div>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div><label class="form-label">NPC Name</label><input type="text" id="npcName" class="input-standard" oninput="updateGenerator()"></div>
+                                <div><label class="form-label">Category Menu</label><input type="text" id="npcCategory" class="input-standard" oninput="updateGenerator()"></div>
+                            </div>
+                            <div class="mb-4"><label class="form-label">GMod Model Path (.mdl)</label><input type="text" id="npcModel" class="input-standard font-mono text-indigo-300" oninput="updateGenerator()"></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="form-label">Factions (Comma Separated)</label><input type="text" id="npcFactions" class="input-standard" oninput="updateGenerator()"></div>
+                                <div><label class="form-label">Physical Model Scale</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="range" id="npcScale" min="0.1" max="5" step="0.1" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valScale').innerText = this.value; updateGenerator()">
+                                        <span id="valScale" class="text-indigo-400 font-mono text-sm w-8 text-right">1.0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3.5 rounded-lg mt-4">
+                                <div><div class="text-sm font-semibold text-zinc-200">Spawn Dead Ragdoll</div><div class="text-xs text-zinc-500 mt-0.5">If ON, the NPC drops a physics ragdoll when killed.</div></div>
+                                <div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="tglRagdollOnDeath" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglRagdollOnDeath" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                            </div>
+                        </div>
+
+                        <!-- Combat Tab -->
+                        <div id="tab-combat" class="hidden animate-fade">
+                            <div class="mb-4"><h2 class="text-lg font-bold text-white">Combat & Stats</h2></div>
+                            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-lg space-y-4 mb-4">
+                                <div><label class="form-label flex justify-between mb-2"><span>Maximum Health</span><span id="valHealth" class="text-emerald-400 font-mono">8001</span></label><input type="range" id="npcHealth" min="1" max="200000" step="10" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valHealth').innerText = this.value; updateGenerator()"></div>
+                                <div><label class="form-label flex justify-between mb-2"><span>Melee Damage</span><span id="valDamage" class="text-orange-400 font-mono">105</span></label><input type="range" id="npcDamage" min="1" max="5000" step="1" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valDamage').innerText = this.value; updateGenerator()"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="form-label flex justify-between mb-2"><span>Walk Speed</span><span id="valWalk" class="text-blue-400 font-mono">100</span></label><input type="range" id="npcWalk" min="10" max="2000" step="10" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valWalk').innerText = this.value; updateGenerator()"></div>
+                                <div><label class="form-label flex justify-between mb-2"><span>Run Speed</span><span id="valRun" class="text-blue-400 font-mono">600</span></label><input type="range" id="npcRun" min="10" max="3000" step="10" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valRun').innerText = this.value; updateGenerator()"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mt-4">
+                                <div id="simple-cooldown"><label class="form-label flex justify-between mb-2"><span>Attack Cooldown (s)</span><span id="valCooldown" class="text-pink-400 font-mono">1.0</span></label><input type="range" id="npcCooldown" min="0.1" max="5" step="0.1" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valCooldown').innerText = this.value; updateGenerator()"></div>
+                                <div><label class="form-label flex justify-between mb-2"><span>Melee Attack Range (Hitbox)</span><span id="valMeleeRange" class="text-blue-400 font-mono">75</span></label><input type="range" id="meleeRange" min="20" max="500" step="5" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valMeleeRange').innerText = this.value; updateGenerator()"></div>
+                            </div>
+                        </div>
+
+                        <!-- Animations Tab -->
+                        <div id="tab-animations" class="hidden animate-fade">
+                            <div class="mb-4"><h2 class="text-lg font-bold text-white">Animation Sequences</h2></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-3">
+                                    <div><label class="form-label">Idle Animation</label><input type="text" id="animIdle" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                    <div><label class="form-label">Walk Animation</label><input type="text" id="animWalk" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                    <div><label class="form-label">Run Animation</label><input type="text" id="animRun" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div id="simple-melee-anims">
+                                        <label class="form-label flex justify-between items-center mb-1">Melee Punches (1 to 4)
+                                            <select id="meleeCount" class="bg-zinc-800 text-white rounded outline-none border border-zinc-700 px-1 py-0.5 text-[10px]" onchange="updateGenerator()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+                                        </label>
+                                        <div class="space-y-1.5" id="meleeInputsContainer">
+                                            <input type="text" id="animMelee1" class="input-standard font-mono text-xs" oninput="updateGenerator()">
+                                            <input type="text" id="animMelee2" class="input-standard font-mono text-xs hidden" oninput="updateGenerator()">
+                                            <input type="text" id="animMelee3" class="input-standard font-mono text-xs hidden" oninput="updateGenerator()">
+                                            <input type="text" id="animMelee4" class="input-standard font-mono text-xs hidden" oninput="updateGenerator()">
+                                        </div>
+                                    </div>
+                                    <div id="norpa-melee-anims" class="hidden space-y-1.5">
+                                        <label class="form-label text-red-400">Norpa Special Attacks</label>
+                                        <input type="text" id="animStomp" placeholder="Stomp Anim" class="input-standard font-mono text-xs" oninput="updateGenerator()">
+                                        <input type="text" id="animBite" placeholder="Bite Anim" class="input-standard font-mono text-xs" oninput="updateGenerator()">
+                                        <input type="text" id="animRange" placeholder="Shockwave Anim" class="input-standard font-mono text-xs" oninput="updateGenerator()">
+                                        <input type="text" id="animSuck" placeholder="Suck Anim" class="input-standard font-mono text-xs" oninput="updateGenerator()">
+                                        <input type="text" id="animEat" placeholder="Eat Anim" class="input-standard font-mono text-xs" oninput="updateGenerator()">
+                                        <input type="text" id="animSummon" placeholder="Summon Anim" class="input-standard font-mono text-xs" oninput="updateGenerator()">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 pt-4 mt-2 border-t border-zinc-800" id="jump-climb-anims">
+                                <div><label class="form-label">Jump / Leap</label><input type="text" id="animLeap" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                <div><label class="form-label">Climb</label><input type="text" id="animClimb" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                            </div>
+                        </div>
+
+                        <!-- Sounds Tab -->
+                        <div id="tab-sounds" class="hidden animate-fade">
+                            <div class="mb-4"><h2 class="text-lg font-bold text-white">Sound Effects</h2></div>
+                            <div class="space-y-3">
+                                <div><label class="form-label text-indigo-400">Idle / Ambience Sound</label><input type="text" id="soundIdle" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                <div><label class="form-label text-orange-400">Reveal / Roar Sound</label><input type="text" id="soundRoar" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                <div id="simple-sounds" class="grid grid-cols-2 gap-4 pt-3 mt-1 border-t border-zinc-800">
+                                    <div><label class="form-label text-emerald-400">Melee Hit</label><input type="text" id="soundHit" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                    <div><label class="form-label text-rose-400">Melee Miss</label><input type="text" id="soundMiss" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                </div>
+                                <div id="norpa-sounds" class="hidden pt-3 mt-1 border-t border-zinc-800 space-y-3">
+                                    <div><label class="form-label text-red-400">Heavy Step / Stomp Sound</label><input type="text" id="soundStep" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                    <div>
+                                        <label class="form-label text-purple-400 flex justify-between"><span>Step Sound Delay (s)</span><span id="valStepTime" class="font-mono">0.9</span></label>
+                                        <input type="range" id="stepTime" min="0.1" max="2.0" step="0.1" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valStepTime').innerText = this.value; updateGenerator()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Abilities Tab -->
+                        <div id="tab-abilities" class="hidden animate-fade">
+                            <div class="mb-4"><h2 class="text-lg font-bold text-white">Abilities</h2></div>
+                            
+                            <!-- Simple Abilities -->
+                            <div id="simple-abilities" class="space-y-2.5">
+                                <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-zinc-200">Always Sprint</div><div class="text-xs text-zinc-500 mt-0.5">If he sees someone he will always sprint.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglAlwaysRun" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglAlwaysRun" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-zinc-200">Auto-Open Doors</div><div class="text-xs text-zinc-500 mt-0.5">Forces nearby closed doors to swing open automatically.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglDoors" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglDoors" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-zinc-200">Wall Climbing</div><div class="text-xs text-zinc-500 mt-0.5">Allows NPC to scale walls and ladders using climb anim.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglClimb" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglClimb" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-zinc-200">Reveal Roar</div><div class="text-xs text-zinc-500 mt-0.5">Plays an animation and sound when first spotting an enemy.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglRoar" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglRoar" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                <div id="roarAnimInput" class="mb-2 px-1"><input type="text" id="animRoar" placeholder="Roar Anim Name" class="input-standard font-mono text-xs py-1" oninput="updateGenerator()"></div>
+                                <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-zinc-200">TP</div><div class="text-xs text-zinc-500 mt-0.5">Chance to silently teleport and dodge when taking damage.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglTP" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglTP" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-zinc-200">Leap Attack</div><div class="text-xs text-zinc-500 mt-0.5">Lunges forward aggressively at medium range to close the gap.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglLeapAttack" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglLeapAttack" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-lg border-l-4 border-l-red-500">
+                                    <div><div class="text-sm font-semibold text-zinc-200">Glitch Touch</div><div class="text-xs text-zinc-500 mt-0.5">Permanently scrambles the bones of any Player/NPC it hits.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglGlitchTouch" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglGlitchTouch" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                <div class="bg-indigo-900/10 border border-indigo-500/20 p-3 rounded-lg mt-2">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div><div class="text-sm font-semibold text-indigo-300">Summoner Minions</div><div class="text-xs text-indigo-400/60 mt-0.5">Periodically spawns other NPCs to help fight.</div></div>
+                                        <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglSummon" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglSummon" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                    </div>
+                                    <input type="text" id="summonClass" placeholder="Class name (e.g. npc_fastzombie)" class="w-full bg-zinc-950 border border-indigo-500/30 rounded p-1.5 text-zinc-300 text-xs outline-none focus:border-indigo-500" oninput="updateGenerator()">
+                                </div>
+                            </div>
+
+                            <!-- Norpa Abilities -->
+                            <div id="norpa-abilities" class="hidden space-y-3">
+                                
+                                <div class="bg-red-900/10 border border-red-500/30 p-3 rounded-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div><div class="text-sm font-semibold text-red-400">Giant Stomp (Screen Shake)</div><div class="text-xs text-red-500/70 mt-0.5">Massive knockback attack that shakes nearby screens.</div></div>
+                                        <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglStomp" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglStomp" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div><label class="text-[10px] text-zinc-500">Keybind</label><select id="keyStomp" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" onchange="updateGenerator()"><option value="IN_ATTACK">ATTACK (Left Click)</option><option value="IN_ATTACK2">ATTACK2 (Right Click)</option><option value="IN_RELOAD" selected>RELOAD (R)</option><option value="IN_JUMP">JUMP (Space)</option><option value="IN_USE">USE (E)</option></select></div>
+                                        <div><label class="text-[10px] text-zinc-500">Cooldown (s)</label><input type="number" id="cooldownStomp" value="5" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                        <div><label class="text-[10px] text-zinc-500">Particle Effect</label><input type="text" id="effectStomp" placeholder="effect_name" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-red-900/10 border border-red-500/30 p-3 rounded-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div><div class="text-sm font-semibold text-red-400">Devour (Eat Low HP)</div><div class="text-xs text-red-500/70 mt-0.5">Instantly kills low health entities and absorbs their HP.</div></div>
+                                        <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglBite" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglBite" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div><label class="text-[10px] text-zinc-500">Keybind</label><select id="keyBite" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" onchange="updateGenerator()"><option value="IN_ATTACK">ATTACK (Left Click)</option><option value="IN_ATTACK2" selected>ATTACK2 (Right Click)</option><option value="IN_RELOAD">RELOAD (R)</option><option value="IN_JUMP">JUMP (Space)</option><option value="IN_USE">USE (E)</option></select></div>
+                                        <div><label class="text-[10px] text-zinc-500">Cooldown (s)</label><input type="number" id="cooldownBite" value="8" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                        <div><label class="text-[10px] text-zinc-500">Particle Effect</label><input type="text" id="effectBite" value="blood_impact_red_01" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-red-900/10 border border-red-500/30 p-3 rounded-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div><div class="text-sm font-semibold text-red-400">AOE Shockwave (Range Attack)</div><div class="text-xs text-red-500/70 mt-0.5">Devastating ranged blast that blows enemies away.</div></div>
+                                        <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglRange" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglRange" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div><label class="text-[10px] text-zinc-500">Keybind</label><select id="keyRange" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" onchange="updateGenerator()"><option value="IN_ATTACK">ATTACK (Left Click)</option><option value="IN_ATTACK2">ATTACK2 (Right Click)</option><option value="IN_RELOAD">RELOAD (R)</option><option value="IN_JUMP">JUMP (Space)</option><option value="IN_USE" selected>USE (E)</option></select></div>
+                                        <div><label class="text-[10px] text-zinc-500">Cooldown (s)</label><input type="number" id="cooldownRange" value="10" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                        <div><label class="text-[10px] text-zinc-500">Particle Effect</label><input type="text" id="effectRange" placeholder="effect_name" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-red-900/10 border border-red-500/30 p-3 rounded-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div><div class="text-sm font-semibold text-red-400">Vacuum Suck In</div><div class="text-xs text-red-500/70 mt-0.5">Pulls far away enemies closer to the NPC.</div></div>
+                                        <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglSuck" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglSuck" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div><label class="text-[10px] text-zinc-500">Keybind</label><select id="keySuck" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" onchange="updateGenerator()"><option value="IN_ATTACK">ATTACK (Left Click)</option><option value="IN_ATTACK2">ATTACK2 (Right Click)</option><option value="IN_RELOAD">RELOAD (R)</option><option value="IN_JUMP" selected>JUMP (Space)</option><option value="IN_USE">USE (E)</option></select></div>
+                                        <div><label class="text-[10px] text-zinc-500">Cooldown (s)</label><input type="number" id="cooldownSuck" value="15" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                        <div><label class="text-[10px] text-zinc-500">Particle Effect</label><input type="text" id="effectSuck" placeholder="effect_name" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-red-900/10 border border-red-500/30 p-3 rounded-lg border-l-4 border-l-pink-500">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div><div class="text-sm font-semibold text-pink-400">Eat DrGBase NPC (Fatal)</div><div class="text-xs text-pink-500/70 mt-0.5">Grabs another DrGBase NPC, eats their head with blood, and heals.</div></div>
+                                        <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglEat" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglEat" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div><label class="text-[10px] text-zinc-500">Keybind</label><select id="keyEat" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" onchange="updateGenerator()"><option value="IN_ATTACK">ATTACK (Left Click)</option><option value="IN_ATTACK2">ATTACK2 (Right Click)</option><option value="IN_RELOAD">RELOAD (R)</option><option value="IN_JUMP">JUMP (Space)</option><option value="IN_USE">USE (E)</option><option value="IN_SPEED" selected>SPRINT (Shift)</option></select></div>
+                                        <div><label class="text-[10px] text-zinc-500">Cooldown (s)</label><input type="number" id="cooldownEat" value="20" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                        <div><label class="text-[10px] text-zinc-500">Particle Effect</label><input type="text" id="effectEat" value="blood_impact_red_01" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between bg-red-900/10 border border-red-500/30 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-red-400">Ignite Enemies Aura</div><div class="text-xs text-red-500/70 mt-0.5">Automatically sets nearby enemies on fire and damages them.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglIgnite" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglIgnite" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between bg-emerald-900/10 border border-emerald-500/30 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-emerald-400">Poison Aura</div><div class="text-xs text-emerald-500/70 mt-0.5">Emits toxic gas that constantly damages nearby enemies.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglPoisonAura" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglPoisonAura" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                <div class="flex items-center justify-between bg-orange-900/10 border border-orange-500/30 p-3 rounded-lg">
+                                    <div><div class="text-sm font-semibold text-orange-400">Reflect Damage</div><div class="text-xs text-orange-500/70 mt-0.5">Automatically reflects 50% of taken damage back to attacker.</div></div>
+                                    <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglReflectDamage" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglReflectDamage" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+
+                                <div class="bg-red-900/10 border border-red-500/30 p-3 rounded-lg mt-2">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div><div class="text-sm font-semibold text-red-400">Summoner Minions</div></div>
+                                        <div class="relative inline-block w-10 align-middle"><input type="checkbox" id="tglNorpaSummon" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglNorpaSummon" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 mb-2">
+                                        <div><label class="text-[10px] text-zinc-500">Keybind</label><select id="keySummon" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" onchange="updateGenerator()"><option value="IN_ATTACK">ATTACK (Left Click)</option><option value="IN_ATTACK2">ATTACK2 (Right Click)</option><option value="IN_RELOAD">RELOAD (R)</option><option value="IN_JUMP">JUMP (Space)</option><option value="IN_USE">USE (E)</option><option value="IN_SPEED" selected>SPRINT (Shift)</option></select></div>
+                                        <div><label class="text-[10px] text-zinc-500">Cooldown (s)</label><input type="number" id="cooldownSummon" value="20" class="w-full bg-zinc-950 border border-zinc-700 rounded p-1 text-white text-xs outline-none" oninput="updateGenerator()"></div>
+                                    </div>
+                                    <input type="text" id="summonClassNorpa" placeholder="Class names (e.g. drg_sh_blood, npc_zombie)" class="w-full bg-zinc-950 border border-red-500/30 rounded p-1.5 text-zinc-300 text-xs outline-none focus:border-red-500" oninput="updateGenerator()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Executions Tab -->
+                        <div id="tab-executions" class="hidden animate-fade">
+                            <div class="mb-6">
+                                <h2 class="text-xl font-bold text-white mb-1">Execution Grabs</h2>
+                                <p class="text-xs text-zinc-500">Configure cinematic grabs. (Disabled for Norpa style).</p>
+                            </div>
+                            <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-xl" id="exec-container">
+                                <div class="flex items-center justify-between mb-5 border-b border-zinc-800 pb-5">
+                                    <span class="text-zinc-200 font-semibold text-sm">Enable Execution Grab</span>
+                                    <div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="tglExecution" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-zinc-600 appearance-none cursor-pointer transition-all duration-200" onchange="updateGenerator()"/><label for="tglExecution" class="toggle-label block overflow-hidden h-5 rounded-full bg-zinc-600 cursor-pointer transition-colors duration-200"></label></div>
+                                </div>
+                                
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-5 border-b border-zinc-800 pb-4">
+                                        <div><label class="form-label">Exec Player if HP <=</label><input type="number" id="execPlayerHP" class="input-standard" oninput="updateGenerator()"></div>
+                                        <div><label class="form-label">Exec NPC if HP <= (%)</label>
+                                            <div class="flex items-center gap-2">
+                                                <input type="range" id="execNPCHPPct" min="1" max="100" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('valExecPct').innerText = this.value + '%'; updateGenerator()">
+                                                <span id="valExecPct" class="text-zinc-400 font-mono text-xs w-10 text-right">50%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-5 border-b border-zinc-800 pb-4">
+                                        <div><label class="form-label">Execution Animation</label><input type="text" id="animExec" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                        <div><label class="form-label">Bot's Hand Attachment</label><input type="text" id="execAttachment" placeholder="anim_attachment_RH" class="input-standard font-mono text-xs" oninput="updateGenerator()"></div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="form-label text-indigo-400">Execution Style</label>
+                                        <select id="execStyle" class="w-full bg-zinc-950 border border-zinc-700 rounded-md p-2 text-white text-xs outline-none mb-3" onchange="updateGenerator()">
+                                            <option value="1">Style 1: Looping Beatdown (Red Screen + Blood)</option>
+                                            <option value="2">Style 2: Single Finish (End burst)</option>
+                                        </select>
+                                        <div id="loopCountContainer" class="bg-zinc-900 border border-zinc-800 p-3 rounded">
+                                            <label class="form-label">Beatdown Loops (Hits)</label>
+                                            <input type="number" id="execLoops" class="input-standard" min="1" max="10" oninput="updateGenerator()">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-[#09090b] border border-zinc-800 rounded-2xl w-full max-w-sm transform scale-95 transition-transform duration-200 overflow-hidden shadow-2xl p-6">
+            <h2 class="text-xl font-bold text-white mb-2 tracking-tight">App Settings</h2>
+            <p class="text-sm text-zinc-500 mb-5">Manage your local storage data.</p>
+            <div class="flex flex-col gap-3">
+                <button onclick="clearAllData()" class="bg-red-900/50 hover:bg-red-900 text-red-200 border border-red-500/30 px-5 py-2 rounded-md font-medium text-sm transition shadow text-left">
+                    Clear All Saved NPCs
+                </button>
+                <button onclick="closeSettingsModal()" class="px-4 py-2 text-sm text-zinc-400 hover:text-white transition mt-2">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Selection Modal -->
+    <div id="template-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-[#09090b] border border-zinc-800 rounded-2xl w-full max-w-5xl transform scale-95 transition-transform duration-200 overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-zinc-800/80 flex justify-between items-center bg-zinc-900/50">
+                <h2 class="text-xl font-bold text-white tracking-tight">Choose a Template</h2>
+                <button onclick="closeTemplateModal()" class="text-zinc-500 hover:text-white p-1 rounded-md transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <div class="bg-zinc-900/80 border border-indigo-500/40 rounded-xl p-5 hover:border-indigo-400 hover:bg-zinc-900 transition-all duration-300 cursor-pointer flex flex-col h-full group hover:shadow-[0_0_30px_rgba(99,102,241,0.2)]" onclick="createSimpleTemplate()">
+                        <div class="h-40 rounded-lg mb-5 border border-indigo-500/20 overflow-hidden relative group-hover:border-indigo-400">
+                            <div class="absolute inset-0 bg-black/70 z-10 group-hover:bg-indigo-900/40 transition duration-500"></div>
+                            <div class="absolute inset-0 bg-cover transition-transform duration-1000 group-hover:scale-110 z-0 bg-[url('https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/trevor%20image.png?raw=true')]" style="background-position: center;"></div>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Simple Template</h3>
+                        <p class="text-sm text-zinc-400 mb-6 flex-1 leading-relaxed">is good for if you want to do a good addon like th mod .</p>
+                        <div class="bg-indigo-600 text-white text-center py-2.5 rounded-md text-sm font-semibold group-hover:bg-indigo-500 transition shadow-md">Select Template</div>
+                    </div>
+
+                    <div class="bg-zinc-900/80 border border-red-500/40 rounded-xl p-5 hover:border-red-400 hover:bg-zinc-900 transition-all duration-300 cursor-pointer flex flex-col h-full group hover:shadow-[0_0_30px_rgba(239,68,68,0.2)]" onclick="createNorpaTemplate()">
+                        <div class="h-40 rounded-lg mb-5 border border-red-500/20 overflow-hidden relative group-hover:border-red-400">
+                            <div class="absolute inset-0 bg-black/80 z-10 group-hover:bg-red-900/40 transition duration-500"></div>
+                            <div class="absolute inset-0 bg-cover transition-transform duration-1000 group-hover:scale-110 z-0 bg-[url('https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/norpa%20image.png?raw=true')]" style="background-position: center;"></div>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Norpa Style(BETA Still not working ;-;)</h3>
+                        <p class="text-sm text-zinc-400 mb-6 flex-1 leading-relaxed">good for video npc battle fight .</p>
+                        <div class="bg-red-600 text-white text-center py-2.5 rounded-md text-sm font-semibold group-hover:bg-red-500 transition shadow-md">Select Template</div>
+                    </div>
+
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-5 opacity-70 flex flex-col h-full relative cursor-not-allowed hover:opacity-100 transition group" onclick="showSoonToast()">
+                        <div class="absolute top-4 right-4 bg-zinc-800 text-zinc-400 text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm z-20">Soon...</div>
+                        <div class="h-40 bg-zinc-900/50 rounded-lg mb-5 border border-zinc-800/50 overflow-hidden relative group-hover:border-zinc-700 transition">
+                            <div class="absolute inset-0 bg-black/80 z-10"></div>
+                            <div class="absolute inset-0 bg-cover z-0 bg-[url('https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/3d%20nextbot%20image.png?raw=true')]" style="background-position: center;"></div>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">3D Nextbot Style</h3>
+                        <p class="text-sm text-zinc-500 mb-6 flex-1 leading-relaxed">just 3d nextbot :]</p>
+                        <div class="bg-zinc-800 text-zinc-500 text-center py-2.5 rounded-md text-sm font-semibold group-hover:bg-zinc-700 group-hover:text-zinc-400 transition">Not Available</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intro Animation Overlay -->
+    <div id="introOverlay" class="fixed inset-0 z-[1000] bg-[#09090b] flex items-center justify-center transition-opacity duration-700">
+        <div class="flex flex-col items-center">
+            <div class="w-20 h-20 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-4 animate-bounce overflow-hidden">
+                <img src="https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/drgbase%20icon.png?raw=true" class="w-full h-full object-cover">
+            </div>
+            <h1 class="text-2xl font-bold text-white tracking-tight animate-pulse">Loading DrGBase Maker...</h1>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <script>
+        let savedNPCs = JSON.parse(localStorage.getItem('drgbase_maker_v1_saves')) || [];
+        let currentNPC = null;
+        
+        document.addEventListener('mousemove', (e) => {
+            if(DOM.welcome && DOM.welcome.classList.contains('hidden')) return;
+            const x = e.clientX / window.innerWidth - 0.5;
+            const y = e.clientY / window.innerHeight - 0.5;
+            document.querySelectorAll('.floating-bg').forEach((el, idx) => {
+                const mult = (idx + 1) * 20;
+                el.style.transform = `translate(${x * mult}px, ${y * mult}px)`;
+            });
+        });
+
+        const defaultSimple = {
+            id: null, template: "simple", name: "Fast Zombie (Boss)", category: "Custom NPCs", model: "models/zombie/fast.mdl", factions: "FACTION_ZOMBIE",
+            scale: 1.0, health: 8001, damage: 105, cooldown: 1.0, meleeRange: 75, walk: 100, run: 600,
+            animIdle: "idle", animWalk: "walk_all", animRun: "run_all", meleeCount: 1,
+            animMelee1: "melee", animMelee2: "melee_02", animMelee3: "melee_03", animMelee4: "melee_04", animMelee5: "",
+            animLeap: "leapstrike", animClimb: "climbmount", animExec: "melee", animRoar: "br2_roar",
+            soundIdle: "npc/zombie/zombie_voice_idle1.wav", soundRoar: "physics/body/body_medium_break2.wav", soundHit: "npc/zombie/claw_strike1.wav", soundMiss: "npc/zombie/claw_miss1.wav",
+            ragdollOnDeath: true, alwaysRun: false, climb: true, doors: false, roar: false, tp: false, leapAttack: false,
+            glitchTouch: false, summon: false, summonClass: "npc_fastzombie", execution: false, execPlayerHP: 100, execNPCHPPct: 50,
+            execAttachment: "anim_attachment_RH", execStyle: "1", execLoops: 5, updatedAt: null,
+            // placeholders for Norpa
+            tglStomp: false, tglBite: false, tglRange: false, tglSuck: false, tglEat: false, tglIgnite: false, tglPoisonAura: false, tglReflectDamage: false, tglNorpaSummon: false,
+            animStomp: "", animBite: "", animRange: "", animSuck: "", animSummon: "", animEat: "", soundStep: "", summonClassNorpa: "",
+            keyStomp: "", keyRange: "", keySuck: "", keySummon: "", keyEat: "", keyBite: "",
+            cooldownStomp: 0, cooldownRange: 0, cooldownSuck: 0, cooldownSummon: 0, cooldownEat: 0, cooldownBite: 0,
+            effectStomp: "", effectRange: "", effectSuck: "", effectEat: "", effectBite: "",
+            tglRinging: false, ringDamage: 40, stepTime: 0.9
+        };
+
+        const defaultNorpa = {
+            id: null, template: "norpa", name: "Norpa Boss", category: "Norpa Creatures", model: "models/antlion_guard.mdl", factions: "FACTION_ANTLION",
+            scale: 1.0, health: 78000, damage: 1850, cooldown: 1.0, meleeRange: 150, walk: 400, run: 800,
+            animIdle: "idle", animWalk: "run1", animRun: "run1", meleeCount: 1,
+            animMelee1: "attack1", animMelee2: "", animMelee3: "", animMelee4: "", animMelee5: "",
+            animLeap: "", animClimb: "", animExec: "", animRoar: "",
+            soundIdle: "npc/antlion_guard/angry1.wav", soundRoar: "npc/antlion_guard/roar1.wav", soundHit: "npc/antlion_guard/shove1.wav", soundMiss: "npc/antlion_guard/shove1.wav",
+            ragdollOnDeath: false, alwaysRun: false, climb: false, doors: false, roar: false, tp: false, leapAttack: false, glitchTouch: false, summon: false, summonClass: "",
+            execution: false, execPlayerHP: 100, execNPCHPPct: 50, execAttachment: "", execStyle: "1", execLoops: 1,
+            // Norpa specific defaults
+            tglStomp: true, tglBite: false, tglRange: true, tglSuck: false, tglEat: true, tglIgnite: false, tglPoisonAura: false, tglReflectDamage: false, tglNorpaSummon: false,
+            animStomp: "attack3", animBite: "attack2", animRange: "roar", animSuck: "bark", animSummon: "roar", animEat: "attack2",
+            soundStep: "npc/antlion_guard/foot_heavy1.wav", summonClassNorpa: "npc_antlion",
+            keyStomp: "IN_RELOAD", keyRange: "IN_ATTACK2", keySuck: "IN_JUMP", keySummon: "IN_SPEED", keyEat: "IN_USE", keyBite: "IN_ATTACK2",
+            cooldownStomp: 5, cooldownRange: 10, cooldownSuck: 15, cooldownSummon: 20, cooldownEat: 20, cooldownBite: 8,
+            effectStomp: "blood_impact_red_01", effectRange: "blood_impact_red_01", effectSuck: "blood_impact_red_01", effectEat: "blood_impact_red_01", effectBite: "blood_impact_red_01",
+            tglRinging: false, ringDamage: 40, stepTime: 0.9, updatedAt: null
+        };
+
+        const DOM = {
+            welcome: document.getElementById('welcome-screen'), editor: document.getElementById('editor-screen'),
+            savesGrid: document.getElementById('saves-grid'), codePreview: document.getElementById('codePreview'),
+            filename: document.getElementById('filenameDisplay'), headerName: document.getElementById('header-npc-name'),
+            editorTemplateIcon: document.getElementById('editorTemplateIcon')
+        };
+
+        function formatDate(ms) { if(!ms) return "Just now"; return new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+
+        function showWelcomeScreen() {
+            if (DOM.welcome) DOM.welcome.classList.remove('hidden');
+            if (DOM.editor) DOM.editor.classList.add('hidden');
+            renderSaves();
+        }
+
+        function showEditor() {
+            if (DOM.welcome) DOM.welcome.classList.add('hidden');
+            if (DOM.editor) {
+                DOM.editor.classList.remove('hidden');
+                DOM.editor.style.display = 'flex';
+            }
+            
+            if(currentNPC.template === 'norpa') {
+                if(DOM.editorTemplateIcon) DOM.editorTemplateIcon.src = "https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/norpa%20image.png?raw=true";
+                document.getElementById('simple-abilities').classList.add('hidden');
+                document.getElementById('norpa-abilities').classList.remove('hidden');
+                document.getElementById('simple-melee-anims').classList.add('hidden');
+                document.getElementById('norpa-melee-anims').classList.remove('hidden');
+                document.getElementById('simple-sounds').classList.add('hidden');
+                document.getElementById('norpa-sounds').classList.remove('hidden');
+                document.getElementById('btn-tab-executions').style.display = 'none';
+                document.getElementById('jump-climb-anims').classList.add('hidden');
+            } else {
+                if(DOM.editorTemplateIcon) DOM.editorTemplateIcon.src = "https://github.com/thegamershon-stack/dgrbase-maker-/blob/main/trevor%20image.png?raw=true";
+                document.getElementById('simple-abilities').classList.remove('hidden');
+                document.getElementById('norpa-abilities').classList.add('hidden');
+                document.getElementById('simple-melee-anims').classList.remove('hidden');
+                document.getElementById('norpa-melee-anims').classList.add('hidden');
+                document.getElementById('simple-sounds').classList.remove('hidden');
+                document.getElementById('norpa-sounds').classList.add('hidden');
+                document.getElementById('btn-tab-executions').style.display = 'flex';
+                document.getElementById('jump-climb-anims').classList.remove('hidden');
+            }
+            
+            populateForm(currentNPC);
+            updateGenerator();
+        }
+
+        function switchTab(tabId) {
+            const tabs = ['tab-identity', 'tab-combat', 'tab-animations', 'tab-sounds', 'tab-abilities', 'tab-executions'];
+            tabs.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.add('hidden');
+                const btn = document.getElementById('btn-' + id);
+                if(btn) btn.className = "nav-inactive px-5 py-2.5 text-sm font-medium text-left flex items-center gap-3 transition";
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).className = "nav-active px-5 py-2.5 text-sm font-medium text-left flex items-center gap-3 transition";
+        }
+
+        function openTemplateModal() {
+            const modal = document.getElementById('template-modal');
+            modal.classList.remove('hidden'); void modal.offsetWidth;
+            modal.classList.remove('opacity-0'); modal.children[0].classList.remove('scale-95'); modal.children[0].classList.add('scale-100');
+        }
+
+        function closeTemplateModal() {
+            const modal = document.getElementById('template-modal');
+            modal.classList.add('opacity-0'); modal.children[0].classList.remove('scale-100'); modal.children[0].classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function openSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.remove('hidden'); void modal.offsetWidth;
+            modal.classList.remove('opacity-0'); modal.children[0].classList.remove('scale-95'); modal.children[0].classList.add('scale-100');
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.add('opacity-0'); modal.children[0].classList.remove('scale-100'); modal.children[0].classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function clearAllData() {
+            if(confirm("Are you sure you want to delete ALL saved NPCs? This cannot be undone.")) {
+                localStorage.removeItem('drgbase_maker_v1_saves');
+                savedNPCs = [];
+                renderSaves();
+                closeSettingsModal();
+                showToast("All data cleared.");
+            }
+        }
+
+        function createSimpleTemplate() { closeTemplateModal(); currentNPC = JSON.parse(JSON.stringify(defaultSimple)); currentNPC.id = Date.now(); currentNPC.updatedAt = Date.now(); showEditor(); showToast("Simple Template loaded."); switchTab('tab-identity'); }
+        function createNorpaTemplate() { closeTemplateModal(); currentNPC = JSON.parse(JSON.stringify(defaultNorpa)); currentNPC.id = Date.now(); currentNPC.updatedAt = Date.now(); showEditor(); showToast("Norpa Style loaded."); switchTab('tab-identity'); }
+        function showSoonToast() { showToast("Coming soon!"); }
+
+        function goBackToDashboard() {
+            if(currentNPC) saveCurrentNPC(false);
+            showWelcomeScreen();
+        }
+
+        function renderSaves() {
+            if (!DOM.savesGrid) return;
+            DOM.savesGrid.innerHTML = '';
+            if(savedNPCs.length === 0) {
+                DOM.savesGrid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center p-16 border-2 border-dashed border-zinc-800 rounded-xl bg-zinc-900/50">
+                        <div class="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mb-4"><svg class="w-8 h-8 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg></div>
+                        <h3 class="text-zinc-300 font-medium text-lg">No NPCs Found</h3>
+                        <p class="text-zinc-500 text-sm mt-1">Create your first NPC to get started.</p>
+                    </div>`;
+                return;
+            }
+            
+            savedNPCs.sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0)).forEach(npc => {
+                const dateStr = formatDate(npc.updatedAt);
+                const safeName = npc.name || "Unknown NPC";
+                const initials = (safeName.substring(0,2) || "NP").toUpperCase();
+                const colors = ['from-indigo-500 to-cyan-500', 'from-rose-500 to-orange-500', 'from-emerald-500 to-teal-500', 'from-violet-500 to-fuchsia-500', 'from-blue-500 to-indigo-500'];
+                const colorClass = colors[(npc.id || 0) % colors.length];
+                const templateLabel = npc.template ? npc.template.toUpperCase() : 'SIMPLE';
+
+                const card = document.createElement('div');
+                card.className = "bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-600 hover:shadow-xl hover:shadow-zinc-900/50 transition duration-300 group flex flex-col";
+                card.innerHTML = `
+                    <div class="h-28 bg-zinc-950 border-b border-zinc-800 relative flex items-center justify-center overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 bg-gradient-to-br ${colorClass}"></div>
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
+                        <span class="relative text-4xl font-black text-zinc-800 tracking-tighter mix-blend-overlay">${initials}</span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-1 gap-2">
+                            <h3 class="text-base font-bold text-zinc-100 truncate">${safeName}</h3>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-800 text-zinc-400 border border-zinc-700 shrink-0">${templateLabel}</span>
+                        </div>
+                        <p class="text-xs text-zinc-500 mb-5 truncate">${npc.category || "Custom NPCs"}</p>
+                        <div class="mt-auto flex justify-between items-center pt-4 border-t border-zinc-800/50">
+                            <span class="text-[10px] text-zinc-600">Updated ${dateStr}</span>
+                            <div class="flex gap-2">
+                                <button onclick="deleteNPC(${npc.id})" class="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                <button onclick="loadNPC(${npc.id})" class="text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded transition">Edit</button>
+                            </div>
+                        </div>
+                    </div>`;
+                DOM.savesGrid.appendChild(card);
+            });
+        }
+
+        function loadNPC(id) {
+            const found = savedNPCs.find(n => n.id === id);
+            if(found) {
+                currentNPC = JSON.parse(JSON.stringify(found));
+                showEditor();
+                switchTab('tab-identity');
+            }
+        }
+
+        function deleteNPC(id) {
+            if(confirm("Are you sure you want to delete this NPC?")) {
+                savedNPCs = savedNPCs.filter(n => n.id !== id);
+                localStorage.setItem('drgbase_maker_v1_saves', JSON.stringify(savedNPCs));
+                renderSaves();
+            }
+        }
+
+        function saveCurrentNPC(toast = true) {
+            gatherForm();
+            currentNPC.updatedAt = Date.now();
+            const index = savedNPCs.findIndex(n => n.id === currentNPC.id);
+            if(index >= 0) savedNPCs[index] = currentNPC; else savedNPCs.push(currentNPC);
+            localStorage.setItem('drgbase_maker_v1_saves', JSON.stringify(savedNPCs));
+            if(toast) showToast(`Saved ${currentNPC.name}!`);
+        }
+
+        const allKeys = Array.from(new Set([...Object.keys(defaultSimple), ...Object.keys(defaultNorpa)])).filter(k => k !== 'id' && k !== 'updatedAt' && k !== 'template');
+        
+        function populateForm(data) {
+            allKeys.forEach(key => {
+                const elId = key === 'name' ? 'npcName' : key === 'category' ? 'npcCategory' : key === 'model' ? 'npcModel' : 
+                             key === 'factions' ? 'npcFactions' : key === 'scale' ? 'npcScale' : key === 'health' ? 'npcHealth' : key === 'meleeRange' ? 'meleeRange' :
+                             key === 'damage' ? 'npcDamage' : key === 'cooldown' ? 'npcCooldown' : key === 'walk' ? 'npcWalk' : 
+                             key === 'run' ? 'npcRun' : (typeof defaultSimple[key] === 'boolean' || typeof defaultNorpa[key] === 'boolean' ? 'tgl' + key.charAt(0).toUpperCase() + key.slice(1) : key);
+                
+                let el = document.getElementById(elId); if(!el) el = document.getElementById(key);
+
+                if(el && data[key] !== undefined) {
+                    if(el.type === 'checkbox') el.checked = data[key]; else el.value = data[key];
+                    if(el.type === 'range') {
+                        const valDisplay = document.getElementById('val' + key.charAt(0).toUpperCase() + key.slice(1));
+                        if(valDisplay) valDisplay.innerText = el.value + (elId === 'execNPCHPPct' ? '%' : '');
+                    }
+                }
+            });
+            document.getElementById('meleeCount').value = data.meleeCount || 1;
+            for(let i=1; i<=5; i++) {
+                const meleeEl = document.getElementById('animMelee'+i);
+                if (meleeEl) {
+                    if(i <= data.meleeCount) meleeEl.classList.remove('hidden');
+                    else meleeEl.classList.add('hidden');
+                }
+            }
+            const loopContainer = document.getElementById('loopCountContainer');
+            if (loopContainer) {
+                if(data.execStyle === "1") loopContainer.classList.remove('hidden');
+                else loopContainer.classList.add('hidden');
+            }
+            if (DOM.headerName) DOM.headerName.innerText = data.name || "Unknown NPC";
+        }
+
+        function gatherForm() {
+            allKeys.forEach(key => {
+                const elId = key === 'name' ? 'npcName' : key === 'category' ? 'npcCategory' : key === 'model' ? 'npcModel' : 
+                             key === 'factions' ? 'npcFactions' : key === 'scale' ? 'npcScale' : key === 'health' ? 'npcHealth' : key === 'meleeRange' ? 'meleeRange' :
+                             key === 'damage' ? 'npcDamage' : key === 'cooldown' ? 'npcCooldown' : key === 'walk' ? 'npcWalk' : 
+                             key === 'run' ? 'npcRun' : (typeof defaultSimple[key] === 'boolean' || typeof defaultNorpa[key] === 'boolean' ? 'tgl' + key.charAt(0).toUpperCase() + key.slice(1) : key);
+                
+                let el = document.getElementById(elId); if(!el) el = document.getElementById(key);
+
+                if(el) {
+                    if(el.type === 'checkbox') currentNPC[key] = el.checked;
+                    else if(el.type === 'number' || el.type === 'range') currentNPC[key] = parseFloat(el.value);
+                    else currentNPC[key] = el.value;
+                }
+            });
+        }
+
+        function updateGenerator() {
+            if(!currentNPC) return;
+            gatherForm();
+            const count = parseInt(currentNPC.meleeCount);
+            for(let i=1; i<=5; i++) {
+                const meleeEl = document.getElementById('animMelee'+i);
+                if (meleeEl) {
+                    if(i <= count) meleeEl.classList.remove('hidden');
+                    else meleeEl.classList.add('hidden');
+                }
+            }
+            const loopContainer = document.getElementById('loopCountContainer');
+            if (loopContainer) {
+                if(currentNPC.execStyle === "1") loopContainer.classList.remove('hidden');
+                else loopContainer.classList.add('hidden');
+            }
+            
+            if (DOM.headerName) DOM.headerName.innerText = currentNPC.name || "Unknown NPC";
+            const safeName = (currentNPC.name || 'npc').toLowerCase().replace(/[^a-z0-9]/g, '_');
+            if (DOM.filename) DOM.filename.innerText = `npc_${safeName}.lua`;
+            
+            if(currentNPC.template === 'norpa') {
+                if (DOM.codePreview) DOM.codePreview.value = buildNorpaLuaString(currentNPC);
+            } else {
+                if (DOM.codePreview) DOM.codePreview.value = buildSimpleLuaString(currentNPC);
+            }
+        }
+
+        function buildSimpleLuaString(v) {
+            let meleeArray = []; for(let i=1; i<=v.meleeCount; i++) meleeArray.push(`"${v['animMelee'+i]}"`);
+            const meleeAnimsLua = meleeArray.join(', ');
+            const factionsArr = v.factions.split(',').map(f => `"${f.trim()}"`).join(', ');
+
+            return `if not DrGBase then return end
+ENT.Base = "drgbase_nextbot"
+
+-- =========================================================================
+-- [ NEXTBOT CONFIGURATION ]
+-- You can edit these values anytime to easily change the npc's abilities!
+-- =========================================================================
+ENT.Config = {
+    AlwaysRun = ${v.alwaysRun},
+    AutoOpenDoors = ${v.doors},
+    RevealRoar = ${v.roar},
+    RandomTP = ${v.tp},
+    LeapAttack = ${v.leapAttack},
+    GlitchTouch = ${v.glitchTouch},
+    SummonMinions = ${v.summon},
+    SummonClass = "${v.summonClass}",
+    ExecutionGrab = ${v.execution},
+    ExecPlayerHP = ${v.execPlayerHP},
+    ExecNPCHPPct = ${v.execNPCHPPct / 100},
+    GrabAttachment = "${v.execAttachment}",
+    Cooldown = ${v.cooldown},
+    Damage = ${v.damage}
+}
+-- =========================================================================
+
+-- Misc --
+ENT.PrintName = "${v.name}"
+ENT.Category = "${v.category}"
+ENT.Models = {"${v.model}"}
+ENT.BloodColor = BLOOD_COLOR_RED
+ENT.ModelScale = ${v.scale}
+ENT.Omniscient = true
+ENT.RagdollOnDeath = ${v.ragdollOnDeath}
+ENT.CollisionBounds = Vector(17.5, 17.5, 90)
+
+-- Climbing --
+ENT.ClimbLedges = ${v.climb}
+ENT.ClimbLedgesMaxHeight = math.huge
+ENT.ClimbLedgesMinHeight = 0
+ENT.LedgeDetectionDistance = 60
+ENT.ClimbProps = ${v.climb}
+ENT.ClimbLadders = ${v.climb}
+ENT.ClimbLaddersUp = ${v.climb}
+ENT.LaddersUpDistance = 60
+ENT.ClimbSpeed = 100
+ENT.ClimbUpAnimation = "${v.animClimb}"
+ENT.ClimbOffset = Vector(-14, 0, 0)
+
+-- Sounds --
+ENT.OnIdleSounds = {"${v.soundIdle}"}
+ENT.OnIdleSoundDelay = 80
+
+-- Stats --
+ENT.SpawnHealth = ${v.health}
+
+-- AI --
+ENT.RangeAttackRange = 0
+ENT.MeleeAttackRange = ${v.meleeRange}
+ENT.ReachEnemyRange = ${v.meleeRange}
+ENT.AvoidEnemyRange = 0
+
+-- Relationships --
+ENT.Factions = {${factionsArr}}
+
+-- Animations Variables --
+ENT.IdleAnimation = "${v.animIdle}"
+ENT.WalkAnimation = "${v.animWalk}"
+ENT.RunAnimation = "${v.animRun}"
+ENT.JumpAnimation = "${v.animLeap}"
+ENT.MeleeAnimations = {${meleeAnimsLua}}
+ENT.AnimT_Roar = "${v.animRoar}"
+ENT.AnimT_Grab = "${v.animExec}"
+ENT.AnimT_Exec = "${v.animExec}"
+
+-- Movements --
+ENT.UseWalkframes = false
+ENT.WalkSpeed = ${v.walk}
+ENT.RunSpeed = ${v.run}
+
+-- Detection --
+ENT.EyeBone = "ValveBiped.Bip01_Head1"
+ENT.EyeOffset = Vector(10, 0, 1)
+
+-- Possession --
+ENT.PossessionEnabled = true
+ENT.PossessionMovement = POSSESSION_MOVE_8DIR
+ENT.PossessionViews = {
+  { offset = Vector(0, 30, 20), distance = 100 },
+  { offset = Vector(7.5, 0, 0), distance = 0, eyepos = true }
+}
+ENT.PossessionBinds = {
+	[IN_ATTACK] = {{
+		coroutine = true,
+		onkeydown = function(self)
+		    local chosenMelee = self.MeleeAnimations[math.random(1, #self.MeleeAnimations)]
+			self:PlaySequenceAndMove(chosenMelee,1,self.PossessionFaceForward)
+		end
+	}},
+	[IN_ATTACK2] = {{
+		coroutine = true,
+		onkeydown = function(self)
+			self:PossessorNormal()
+			self:FaceTowards(self:GetPos() + self:PossessorNormal())
+			local ent = self:GetClosestEnemy()
+			if not IsValid(ent) then return end
+			if self:GetKiller() and self.Grab then
+				self:Grab(ent)
+			end
+		end
+	}},
+	[IN_JUMP] = {{
+		coroutine = true,
+		onkeydown = function(self)
+			self:Jump(500)
+		end
+	}}
+}
+
+if SERVER then
+
+function ENT:CustomInitialize()
+	self:SetDefaultRelationship(D_HT)
+	for _, anim in ipairs(self.MeleeAnimations) do
+	    self:SequenceEvent(anim, 27/106, self.AttackFunction)
+	end
+	self:SetName("${v.name}_"..self:EntIndex())
+end
+
+function ENT:CustomThink()
+	if self:Health() < self:GetMaxHealth() and (not self.NextRegen or CurTime() > self.NextRegen) then
+		self:SetHealth(math.min(self:GetMaxHealth(), self:Health() + 0))
+        self.NextRegen = CurTime() + 1
+	end
+    
+    if self.Config.AutoOpenDoors then
+        for _, ent in ipairs(ents.FindInSphere(self:WorldSpaceCenter(), 120)) do
+            if IsValid(ent) then
+                local class = ent:GetClass()
+                if class == "prop_door_rotating" or class == "func_door_rotating" or class == "func_door" then
+                    ent:Fire("open", "", 0)
+                end
+            end
+        end
+    end
+    
+    if self.Config.SummonMinions and self:GetKiller() and (not self.NextSummon or CurTime() > self.NextSummon) then
+        local minion = ents.Create(self.Config.SummonClass)
+        if IsValid(minion) then
+            minion:SetPos(self:GetPos() + self:GetForward() * 50 + self:GetRight() * math.random(-50,50))
+            minion:SetAngles(self:GetAngles())
+            minion:Spawn()
+            self:EmitSound("${v.soundRoar}")
+            self.NextSummon = CurTime() + 15
+        end
+    end
+end
+
+-- AI --
+function ENT:GetKiller() return self:GetNW2Bool("Killer") end
+function ENT:OnSpawn() self:KillerEnabled() end
+function ENT:SetKiller(count) return self:SetNW2Bool("Killer", count) end
+function ENT:GetExecution() return self:GetNW2Bool("Execution") end
+function ENT:SetExecution(count) return self:SetNW2Bool("Execution", count) end
+
+function ENT:KillerEnabled()
+	if not self:GetKiller() then
+		self:SetKiller(true)
+		self:RevealEvent()
+	end
+end
+
+function ENT:RevealEvent()
+    if self.Config.RevealRoar then
+	    self:PlaySequenceAndMove(self.AnimT_Roar,1,self.FaceEnemy)
+	    self:EmitSound("${v.soundRoar}",511,100)
+    end
+end
+
+function ENT:ShouldRun()
+    if not self:HasEnemy() then return false end
+    if self.Config.AlwaysRun then return true end
+    return self:GetHullRangeSquaredTo(self:GetEnemy()) < 1500^2
+end
+
+function ENT:OnMeleeAttack(enemy)
+	if self:GetCooldown("MeleeAttack") > 0 then return end
+	local chosenMelee = self.MeleeAnimations[math.random(1, #self.MeleeAnimations)]
+	
+	local canExecute = false
+	if self.Config.ExecutionGrab then
+		if enemy:IsPlayer() then
+			if enemy:Health() <= self.Config.ExecPlayerHP then canExecute = true end
+		elseif enemy:IsNPC() or (enemy.IsNextBot and enemy:IsNextBot()) then
+            local maxHP = enemy:GetMaxHealth()
+            if not maxHP or maxHP <= 0 then maxHP = enemy:Health() end
+			if enemy:Health() <= (maxHP * self.Config.ExecNPCHPPct) then canExecute = true end
+		end
+	end
+	
+	if canExecute then
+		if enemy.VJ_IsHugeMonster then
+			self:PlaySequenceAndMove(chosenMelee,1,self.FaceEnemy)
+		else
+			self:SetExecution(true)
+			self:Grab(enemy)
+			return
+		end
+	else
+		self:PlaySequenceAndMove(chosenMelee,1,self.FaceEnemy)
+	end
+	
+	self:SetCooldown("MeleeAttack", self.Config.Cooldown)
+end
+
+function ENT:Grab(ent)
+    local grabbed = false
+    local succeed = false
+    self:SetVelocity(Vector(0,0,0))
+    self:PlaySequence(self.AnimT_Grab, 1, function(self, cycle)
+        if grabbed or cycle < 0.28571428571429 then return end
+        grabbed = true
+        if not IsValid(ent) then return end
+        if self:GetHullRangeSquaredTo(ent) > 200^2 then self:SetExecution(false) return end
+        succeed = true
+        
+        local dmg = DamageInfo() dmg:SetAttacker(self)
+        local ragdoll = ent:DrG_RagdollDeath(dmg)
+        
+        local targetBone = "ValveBiped.Bip01_Head1"
+        if ent:LookupBone("ValveBiped.Bip01_Head1") then targetBone = "ValveBiped.Bip01_Head1"
+        elseif ent:LookupBone("ValveBiped.Bip01_Spine4") then targetBone = "ValveBiped.Bip01_Spine4"
+        else targetBone = "ValveBiped.Bip01_Pelvis" end
+        
+        actualragdoll = self:GrabRagdoll(ragdoll, targetBone, self.Config.GrabAttachment)
+        if not IsValid(actualragdoll) then actualragdoll = self:GrabRagdoll(ragdoll, "ValveBiped.Bip01_Pelvis", self.Config.GrabAttachment) end
+        
+        if ent:IsPlayer() or ent:IsNPC() or ent:IsNextBot() then ent:SetPos(self:GetPos() + (self:GetForward()*60) + Vector(0,0,60)) end
+        return true
+    end)
+    
+    if succeed then
+        ${v.execStyle === "1" ? `
+        local loops = ${v.execLoops}
+        local interval = 0.5
+        for i=1, loops do
+            self:Timer(i * interval, function()
+                self:EmitSound("${v.soundHit}", 80)
+                ParticleEffectAttach("blood_advisor_puncture", PATTACH_POINT_FOLLOW, self, 3)
+                for b=1, math.random(5,10) do ParticleEffectAttach("blood_impact_red_01", PATTACH_POINT_FOLLOW, self, 3) end
+                if ent:IsPlayer() then ent:ScreenFade(SCREENFADE.IN, Color(255,0,0,255), 0.3, 0.2) end
+            end)
+        end
+        self:Timer((loops * interval) + 0.5, function()
+            self:DropRagdoll(actualragdoll)
+            if IsValid(actualragdoll) then
+                actualragdoll:Fire("fadeandremove",1,10)
+            end
+            self:SetExecution(false)
+            self:SetCooldown("MeleeAttack", self.Config.Cooldown)
+        end)
+        self:PlaySequence(self.AnimT_Exec)` : `
+        self:Timer(1.5, function()
+            self:EmitSound("${v.soundHit}", 80)
+            ParticleEffectAttach("blood_advisor_puncture", PATTACH_POINT_FOLLOW, self, 3)
+            for b=1, math.random(5,10) do ParticleEffectAttach("blood_impact_red_01", PATTACH_POINT_FOLLOW, self, 3) end
+            if ent:IsPlayer() then ent:ScreenFade(SCREENFADE.IN, Color(255,0,0,255), 0.3, 0.2) end
+            
+            self:DropRagdoll(actualragdoll)
+            if IsValid(actualragdoll) then
+                actualragdoll:Fire("fadeandremove",1,10)
+            end
+            self:SetExecution(false)
+            self:SetCooldown("MeleeAttack", self.Config.Cooldown)
+        end)
+        self:PlaySequence(self.AnimT_Exec)
+        `}
+    end
+end
+
+function ENT:OnChaseEnemy(enemy)
+	if self:GetPos():DistToSqr(enemy:GetPos()) < 160000 then
+		if self:IsOnGround() then
+			if self.Config.LeapAttack and math.random(1, 100) <= 5 then
+				local dir = (enemy:GetPos() - self:GetPos()):GetNormalized()
+				self:SetVelocity(dir * 800 + Vector(0,0,300))
+				self:PlaySequenceAndMove(self.JumpAnimation, 1, self.FaceEnemy)
+			end
+		end
+	end
+end
+
+function ENT:OnReachedPatrol()
+	self:Wait(math.random(3, 4))
+end
+
+function ENT:AttackFunction()
+    self:Attack({
+        damage = self.Config.Damage,
+        viewpunch = Angle(15, 0, 0),
+        type = DMG_CRUSH,range=self.MeleeAttackRange,angle=135,
+    }, function(self, hit)
+        if #hit == 0 then self:EmitSound("${v.soundMiss}") return end 
+        self:EmitSound("${v.soundHit}")
+        
+        if self.Config.GlitchTouch then
+            for _, ent in ipairs(hit) do
+                if IsValid(ent) and (ent:IsPlayer() or ent:IsNPC() or (ent.IsNextBot and ent:IsNextBot())) then
+                    if ent.GetBoneCount then
+                        for i = 0, ent:GetBoneCount() - 1 do
+                            if ent.ManipulateBoneScale then
+                                ent:ManipulateBoneScale(i, Vector(math.Rand(0.1, 2), math.Rand(0.1, 2), math.Rand(0.1, 2)))
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end)
+end
+
+function ENT:OnTakeDamage(dmg)
+    if self.Config.RandomTP and self:GetKiller() and math.random(1, 100) <= 25 then
+		local right = math.random(-300, 300)
+		local left = math.random(-300, 300)
+		self:SetPos(self:GetPos() + Vector(left, right, 0))
+		return
+	end
+end
+
+function ENT:OnIdle()
+	self:AddPatrolPos(self:RandomPos(1500))
+end
+end
+
+-- DO NOT TOUCH --
+AddCSLuaFile()
+DrGBase.AddNextbot(ENT)`;
+        }
+
+        function buildNorpaLuaString(v) {
+            const factionsArr = v.factions.split(',').map(f => `"${f.trim()}"`).join(', ');
+
+            return `if not DrGBase then return end -- return if DrGBase isn't installed
+ENT.Base = "drgbase_nextbot" -- DO NOT TOUCH (obviously)
+
+ENT.Config = {
+    GiantStomp = ${v.tglStomp},
+    DevourBite = ${v.tglBite},
+    RangeShockwave = ${v.tglRange},
+    VacuumSuck = ${v.tglSuck},
+    IgniteAura = ${v.tglIgnite},
+    PoisonAura = ${v.tglPoisonAura},
+    ReflectDamage = ${v.tglReflectDamage},
+    SummonMinions = ${v.tglNorpaSummon},
+    EatDrGBase = ${v.tglEat},
+    SummonClassList = {"${v.summonClassNorpa}"},
+    EnableShockwaveRinging = ${v.tglRinging},
+    RingingDamage = ${v.ringDamage},
+    StepSoundTimer = ${v.stepTime}
+}
+
+-- Misc --
+ENT.PrintName = "${v.name}"
+ENT.Category = "${v.category}"
+ENT.Models = {"${v.model}"}
+ENT.Skins = {0}
+ENT.ModelScale = ${v.scale}
+ENT.BloodColor = DONT_BLEED
+ENT.RagdollOnDeath = ${v.ragdollOnDeath}
+
+ENT.SightRange = 2000
+ENT.Omniscient = true
+ENT.CollisionBounds = Vector(20, 20, 140)
+ENT.StepHeight = 30
+
+-- Weapons --
+ENT.Weapons = {""}
+ENT.WeaponAccuracy = 0.01
+ENT.HealthRegen = 0
+
+-- DO NOT TOUCH --
+AddCSLuaFile()
+DrGBase.AddNextbot(ENT)
+
+-- Stats --
+ENT.FallDamage = false
+ENT.SpawnHealth = ${v.health}
+
+-- AI --
+ENT.RangeAttackRange = 800
+ENT.MeleeAttackRange = ${v.meleeRange}
+ENT.SpotDuration = 2
+
+ENT.Factions = { ${factionsArr} }
+ENT.Frightening = false
+ENT.AllyDamageTolerance = 0.001
+ENT.AfraidDamageTolerance = 0.02
+ENT.NeutralDamageTolerance = 0.1
+
+-- Movements/animations --
+ENT.UseWalkframes = false
+ENT.WalkSpeed = ${v.walk}
+ENT.RunSpeed = ${v.run}
+
+ENT.CrouchSpeed = 0
+ENT.CrouchWalkAnimRate = 1
+ENT.CrouchIdleAnimRate = 1
+ENT.IdleAnimRate = 1
+
+ENT.WalkAnimation = ACT_RUN
+ENT.WalkAnimRate = 1
+ENT.RunAnimation = ACT_RUN 	
+ENT.RunAnimRate = 2
+ENT.IdleAnimation = ACT_IDLE
+ENT.JumpAnimRate = 0
+
+ENT.OnSpawnSounds = {""}
+ENT.OnIdleSounds = {"${v.soundIdle}"}
+ENT.IdleSoundDelay = 2
+
+ENT.OnDamageSounds = {""}
+ENT.OnDeathSounds = {""}
+ENT.OnDownedSounds = {}
+ENT.Footsteps = {}
+
+-- Climbing --
+ENT.ClimbLadders = false
+
+-- Weapons --
+ENT.UseWeapons = false
+ENT.DropWeaponOnDeath = false
+ENT.AcceptPlayerWeapons = false
+
+-- Detection --
+ENT.EyeBone = ""
+ENT.EyeOffset = Vector(0, 0, 0)
+
+-- Possession --
+ENT.PossessionEnabled = true
+ENT.PossessionMovement = POSSESSION_MOVE_1DIR
+ENT.PossessionViews = {
+  {
+    offset = Vector(-60, 0, 60),
+    distance = 260
+  }
+}
+
+ENT.PossessionBinds = {
+  [${v.keyStomp}] = {{
+    coroutine = true,
+    onkeydown = function(self)
+        if self.Config.GiantStomp and (not self.NextStomp or CurTime() > self.NextStomp) then
+            self:PlaySequenceAndMove("${v.animStomp}", 1, function(self,cycle) end)
+            self.NextStomp = CurTime() + ${v.cooldownStomp}
+        end
+    end
+  }},
+  [${v.keyRange}] = {{
+    coroutine = true,
+    onkeydown = function(self)
+        if self.Config.RangeShockwave and (not self.NextRange or CurTime() > self.NextRange) then
+		    self:PlaySequenceAndMove("${v.animRange}", 1, function(self,cycle) end)
+            self.NextRange = CurTime() + ${v.cooldownRange}
+        end
+    end
+  }},
+  [${v.keySuck}] = {{
+    coroutine = true,
+    onkeydown = function(self)
+        if self.Config.VacuumSuck and (not self.NextSuck or CurTime() > self.NextSuck) then
+		    self:PlaySequenceAndMove("${v.animSuck}", 1, function(self,cycle) end)
+            self.NextSuck = CurTime() + ${v.cooldownSuck}
+        end
+    end
+  }},
+  [${v.keySummon}] = {{
+    coroutine = true,
+    onkeydown = function(self)
+        if self.Config.SummonMinions and (not self.NextSumm or CurTime() > self.NextSumm) then
+		    self:PlaySequenceAndMove("${v.animSummon}", 1, function(self,cycle) end)
+            self.NextSumm = CurTime() + ${v.cooldownSummon}
+        end
+    end
+  }},
+  [${v.keyEat}] = {{
+    coroutine = true,
+    onkeydown = function(self)
+        if self.Config.EatDrGBase and (not self.NextEat or CurTime() > self.NextEat) then
+		    self:PlaySequenceAndMove("${v.animEat}", 1, function(self,cycle) end)
+            self.NextEat = CurTime() + ${v.cooldownEat}
+        end
+    end
+  }}
+}
+
+if SERVER then
+
+ function ENT:AimAt(pos)
+     self:DirectPoseParametersAt(pos, "aim_pitch", "aim_yaw")
+  end
+  function ENT:_BaseInitialize()
+  end
+  function ENT:_BaseThink()
+    if not self:IsPossessed() then
+      if self:HasEnemy() and not self:IsAIDisabled() then
+        local enemy = self:GetEnemy()
+        if self:IsInSight(enemy) then
+          self:AimAt(enemy)
+        else self:AimAt() end
+      elseif self:HasWeapon() then
+        self:HolsterWeapon()
+        if not self:IsWeaponPrimaryFull() then
+          self:WeaponReload()
+        end
+      end
+    else
+      local tr = self:PossessorTrace()
+      if self:HasWeapon() and not self:IsWeaponHolstered() then
+        self:AimAt(tr.HitPos)
+      else self:AimAt() end
+    end
+  end
+
+end
+
+if SERVER then
+
+function ENT:OneRinging()
+	if IsValid(self) and self.Config.EnableShockwaveRinging then
+		local enemies = ents.FindInSphere( self:GetPos(), 500*self:GetModelScale() )
+		for M=1, #enemies do
+			if IsValid(enemies[M]) and ( (enemies[M]:IsNPC() or enemies[M]:IsNextBot() ) and enemies[M]:GetClass() ~= self:GetClass() ) and self:Disposition( enemies[M] ) == 1 then
+				enemies[M]:TakeDamage( self.Config.RingingDamage, self, self)
+			end	
+
+			if IsValid(enemies[M]) and (enemies[M]:IsPlayer() and GetConVarNumber("ai_ignoreplayers") == 0 ) then 		
+				enemies[M]:TakeDamage( self.Config.RingingDamage / 10, self, self)
+			end				
+		end	
+	end
+end
+
+function ENT:SetEnemiesInFire(attacker) 
+    if self.Config.IgniteAura and IsValid(attacker) then
+        local enemies = ents.FindInSphere( self:GetPos(), 1500 )
+        for M=1, #enemies do
+            if IsValid(enemies[M]) and (enemies[M]:IsNPC() or enemies[M]:IsNextBot() ) and   
+                ((enemies[M].Factions == nil) or (enemies[M].Factions ~= nil and enemies[M].Factions[1] ~= self.Factions[1])) then
+                enemies[M]:Ignite(5, 1)
+                enemies[M]:TakeDamage( attacker:GetMaxHealth()*0.05, self, self)
+            end 
+        end 
+    end
+end
+
+function ENT:EatableENTSizeChecker(EatAble)
+    if IsValid(EatAble) then
+        self.enemy_BoxMin, self.enemy_BoxMax = EatAble:OBBMins(), EatAble:OBBMaxs()             
+        self.enemy_SizeX = (math.abs(self.enemy_BoxMin.x)+math.abs(self.enemy_BoxMax.x))/2
+        self.enemy_SizeY = (math.abs(self.enemy_BoxMin.y)+math.abs(self.enemy_BoxMax.y))/2
+        self.enemy_SizeZ = (math.abs(self.enemy_BoxMin.z)+math.abs(self.enemy_BoxMax.z))/2      
+
+        if IsValid(EatAble) and (self.enemy_SizeX<200 and self.enemy_SizeY<200 and self.enemy_SizeZ<300) then
+            return true 
+        end
+        return false
+    end
+end
+
+function ENT:CustomThink()
+	if IsValid(self) then
+		local enemies = ents.FindInSphere( self:GetPos(), 700*self:GetModelScale() )
+		for M=1, #enemies do
+			if IsValid(enemies[M]) and (enemies[M]:IsNPC() or enemies[M]:IsNextBot() ) and   
+				((enemies[M].Factions == nil) or (enemies[M].Factions ~= nil and enemies[M].Factions[1] ~= self.Factions[1])) then
+					self.RandTriggerTime = math.random(3,5)
+					self.RandTiggerOFFTime = math.random(4,4)
+				end	
+			end
+	end
+
+	if IsValid(self) and not IsValid(self:GetEnemy()) then
+		self.RandTriggerTime = math.random(5,15)
+		self.RandTiggerOFFTime = math.random(1,4)
+	end
+    
+    if IsValid(self) and IsValid(self:GetEnemy()) then
+        self.EnemyPos = self:GetEnemy()
+        if self.EatableENTSizeChecker then self:EatableENTSizeChecker(self.EnemyPos) end
+    end
+    
+    if self.Config.PoisonAura then
+        for _, ent in ipairs(ents.FindInSphere(self:GetPos(), 300)) do
+            if IsValid(ent) and (ent:IsPlayer() or ent:IsNPC() or ent:IsNextBot()) and ent ~= self then
+                ent:TakeDamage(5, self, self)
+            end
+        end
+    end
+    
+    if not self.NextStepSound then self.NextStepSound = CurTime() end
+    if self:IsMoving() and CurTime() > self.NextStepSound then
+        self:EmitSound("${v.soundStep}", 80, 80, 1) 
+        self.NextStepSound = CurTime() + self.Config.StepSoundTimer
+    end
+end
+
+function ENT:OnTakeDamage(dmginfo,hitgroup ) 
+	self:EmitSound("${v.soundMiss}", 90, 100, 1)
+
+    if self.Config.ReflectDamage and IsValid(dmginfo:GetAttacker()) and dmginfo:GetAttacker() ~= self then
+        dmginfo:GetAttacker():TakeDamage(dmginfo:GetDamage() * 0.5, self, self)
+    end
+
+	if math.random(1,5) == 1 then
+		timer.Simple(0.9, function()
+			if IsValid(self) then
+				self:StopSound( "CallForLesson" )
+				timer.Remove("RingingGEST"..tostring(self))
+			end
+		end)
+	end
+
+	if hitgroup == 11 then
+		self:EmitSound("${v.soundHit}", 120, 100, 1)
+		self:OneRinging()
+	end
+
+	if hitgroup == 0 then	
+		ParticleEffect("blood_advisor_puncture",self:NearestPoint(dmginfo:GetDamagePosition()), Angle(0,0,0)) 
+	end
+	
+	if (dmginfo:GetDamageType() == 67108865 or dmginfo:GetDamageType() ==  67108864)  then 
+		return 0 
+	end
+    
+    if self:EatableENTSizeChecker(dmginfo:GetAttacker()) == true then
+        dmginfo:ScaleDamage(0.5) 
+    end
+    if self:EatableENTSizeChecker(dmginfo:GetAttacker()) == false then
+        dmginfo:ScaleDamage(0.75) 
+    end 
+end
+
+function ENT:OnRemove()
+	self:StopSound( "IdleLoop" )
+end
+
+function ENT:CustomInitialize()
+	sound.Add( {
+		name = "IdleLoop",
+		channel = CHAN_STATIC,
+		volume = 0.75,
+		level = 110,
+		pitch = math.random(80,100),
+		sound = "${v.soundIdle}"
+	} )
+	self:EmitSound( "IdleLoop" )	
+	self:SetDefaultRelationship(D_HT)
+    
+    self:SetAttack("${v.animStomp}", true)
+    self:SetAttack("${v.animBite}", true)
+    self:SetAttack("${v.animRange}", true)   
+    self:SetAttack("${v.animSuck}", true) 
+    self:SetAttack("${v.animSummon}", true)  
+    self:SetAttack("${v.animEat}", true)  
+    self:SetAttack("${v.animMelee1 || 'melee_01'}", true) 
+
+	self.RandTriggerTime = math.random(5,15)
+	self.RandTiggerOFFTime = math.random(1,4)
+	self.CanUseRangeATT = true 
+	self.NextRangeAtt = 3
+	self.StartHP = self:GetMaxHealth()
+    self.flamedmgrange = 0
+    self.flamedmgUPpos = 0
+    self.Summoning = false
+    self.CanSummon = false
+    self.Child = {}
+    self.NextSummonVar = 20 
+    self.NextSuckVar = 10
+    self.CanSuckIn = true
+
+	timer.Create("Shockwave"..tostring(self),self.RandTriggerTime,0,function()
+		if IsValid(self) then
+			if math.random(1,2) == 1 then
+				timer.Simple(0.9, function()
+					if IsValid(self) then
+						self:StopSound( "CallForLesson" )
+						timer.Remove("RingingGEST"..tostring(self))
+					end
+				end)
+			else
+				timer.Simple(self.RandTiggerOFFTime, function()
+					if IsValid(self) then
+						self:StopSound( "CallForLesson" )
+						timer.Remove("RingingGEST"..tostring(self))
+					end
+				end)				
+			end
+		end
+	end)
+end
+
+function ENT:OnMeleeAttack(enemy)
+	self.MeleeAtt = true
+	self.RangeAtt = false
+	if self:IsOnGround() == false then return end
+
+	if self:GetForward():Dot((self:GetEnemy():GetPos() - self:GetPos()):GetNormalized()) > math.cos(math.rad(10)) then
+		self:EmitSound("${v.soundMiss}", 90, 100, 1)
+		if self.Config.GiantStomp and self:EatableENTSizeChecker(enemy) == true and (not self.NextStomp or CurTime() > self.NextStomp) then
+            self:PlaySequenceAndMove("${v.animStomp}", 1, self.FaceEnemy)
+            self.NextStomp = CurTime() + ${v.cooldownStomp}
+        else
+            if math.random(1,3) == 3 and self:GetEnemy():Health() < self:GetMaxHealth()*0.1 and self.Config.DevourBite and (not self.NextBite or CurTime() > self.NextBite) then 
+                self:PlaySequenceAndMove("${v.animBite}", 1, self.FaceEnemy)
+                self.NextBite = CurTime() + ${v.cooldownBite}
+            else
+                self:PlaySequenceAndMove("${v.animMelee1 || 'melee_01'}", 1, self.FaceEnemy)
+            end
+        end 
+	end	
+end
+	
+function ENT:OnRangeAttack(enemy)
+	if self:GetPos():Distance(self:GetEnemy():GetPos()) > 100 and self:GetPos():Distance(self:GetEnemy():GetPos()) < 400 and self:GetForward():Dot((self:GetEnemy():GetPos() - self:GetPos()):GetNormalized()) > math.cos(math.rad(50)) then
+		if self.CanUseRangeATT == true then
+			if self:Health() > self.StartHP/2 then	 
+				self:EmitSound("${v.soundIdle}", 90, 80, 1) 
+				self:PlaySequenceAndMove("${v.animIdle}", 1, self.FaceEnemy)
+				self:StopSound( "CallForLesson" )
+				timer.Remove("Ringing"..tostring(self))	  
+			end
+			if self:Health() < self.StartHP/2 then
+				self:EmitSound("${v.soundRoar}", 90, 80, 1) 
+				self:PlaySequenceAndMove("${v.animIdle}", 1, self.FaceEnemy)
+				self:StopSound( "CallForLesson" )
+				timer.Remove("Ringing2"..tostring(self))	 			
+			end
+			self.CanUseRangeATT = false
+			timer.Simple(self.NextRangeAtt, function()
+				if IsValid(self) and self.CanUseRangeATT == false then
+					self.CanUseRangeATT = true
+				end
+			end)
+		end	
+	end
+    
+    if self:GetPos():Distance(self:GetEnemy():GetPos()) > 1800 and self:GetForward():Dot((self:GetEnemy():GetPos() - self:GetPos()):GetNormalized()) > math.cos(math.rad(20)) then
+        if self.Config.RangeShockwave and self.CanUseRangeATT == true and (not self.NextRange or CurTime() > self.NextRange) then
+            self:PlaySequenceAndMove("${v.animRange}", 1, self.FaceEnemy)
+            self.NextRange = CurTime() + ${v.cooldownRange}
+            if math.random(1,2) == 1 then
+                self.CanUseRangeATT = false
+                timer.Simple(self.NextRangeAtt, function()
+                    if IsValid(self) and self.CanUseRangeATT == false then
+                        self.CanUseRangeATT = true
+                    end
+                end)
+            end 
+        end
+   
+        if self.Config.VacuumSuck and self.CanSuckIn == true and self:EatableENTSizeChecker(enemy) == true and enemy:Health() < 3000 and (not self.NextSuck or CurTime() > self.NextSuck) then
+            self:PlaySequenceAndMove("${v.animSuck}", 1, self.FaceEnemy)
+            self.CanSuckIn = false
+            self.NextSuck = CurTime() + ${v.cooldownSuck}
+            timer.Simple(self.NextSuckVar, function()
+                if IsValid(self) and self.CanSuckIn == false then
+                    self.CanSuckIn = true
+                end
+            end)
+        end
+
+        if self.Config.SummonMinions and self.Summoning == false and (not self.NextSumm or CurTime() > self.NextSumm) then
+            self:PlaySequenceAndMove("${v.animSummon}", 1, self.FaceEnemy)
+            self.Summoning = true
+            self.NextSumm = CurTime() + ${v.cooldownSummon}
+            timer.Simple(self.NextSummonVar, function()
+                if IsValid(self) and self.Summoning == true then
+                    self.Summoning = false
+                end
+            end)
+        end
+        
+        if self.Config.EatDrGBase and (not self.NextEat or CurTime() > self.NextEat) and (enemy.IsDrGNextbot or enemy:IsNPC()) then
+            self:PlaySequenceAndMove("${v.animEat}", 1, self.FaceEnemy)
+            self.NextEat = CurTime() + ${v.cooldownEat}
+        end
+    end
+end
+
+function ENT:HandleAnimEvent(a,b,c,d,e)
+    if e == "${v.animStomp}" then
+        if IsValid(self) then
+            util.ScreenShake( self:GetPos(), 5, 3, 1, 20000 )
+            self:EmitSound("${v.soundStep}", 100, 80, 1) 
+            if "${v.effectStomp}" ~= "" then ParticleEffect("${v.effectStomp}", self:GetPos(), Angle(0,0,0)) end
+
+            if IsValid(self) then
+                self:Attack({
+                    damage = ${v.damage * 1.5},      
+                    type = bit.bor(DMG_SLASH,DMG_CLUB),
+                    range=1700,
+                    push=true,
+                    force = Vector(600, 0, 150)  
+                }, function(self, hit) 
+                    if (#hit > 0) then
+                        self:EmitSound("${v.soundHit}", 100, 100, 1) 
+                    
+                    if IsValid(self) and IsValid(self:GetEnemy()) then
+                        local enemies = ents.FindInSphere( self:GetPos()+self:GetForward()*20, 1500 )
+                        for M=1, #enemies do
+                        if ( (enemies[M]:IsNPC() or enemies[M]:IsNextBot()) and enemies[M]:GetClass() ~= self:GetClass() ) or enemies[M]:IsPlayer() and GetConVarNumber("ai_ignoreplayers") == 0 then
+                            enemies[M]:SetGroundEntity(NULL)
+                            if enemies[M].SetLocalVelocity then enemies[M]:SetLocalVelocity(self:GetForward()*600+enemies[M]:GetUp()*300) else enemies[M]:SetVelocity(self:GetForward()*600+enemies[M]:GetUp()*300) end
+                            local phys = enemies[M]:GetPhysicsObject()
+                            if (phys:IsValid()) then
+                                phys:Wake()  
+                                phys:ApplyForceCenter(enemies[M]:GetForward()*600+enemies[M]:GetUp()*300 * 1)                   
+                            end
+                        end
+                    end
+                    end
+                    end
+                end)            
+            end
+        end
+        
+    elseif e == "${v.animBite}" then
+        if IsValid(self) then
+            self:EmitSound("${v.soundHit}", 140, 100, 1) 
+            if "${v.effectBite}" ~= "" then ParticleEffectAttach("${v.effectBite}",PATTACH_POINT_FOLLOW,self,0) end
+
+            if IsValid(self) and IsValid(self:GetEnemy()) then
+                self:GetEnemy():TakeDamage(${v.damage * 2}, self, self)
+                self:SetHealth(self:Health()+1800)
+                local phys = self:GetEnemy():GetPhysicsObject()
+                if (phys:IsValid()) then
+                    phys:Wake()  
+                    phys:ApplyForceCenter(self:GetEnemy():GetForward()*200+self:GetEnemy():GetUp()*100 * 1)                  
+                end
+            end
+        end 
+
+    elseif e == "${v.animRange}" then
+        if IsValid(self) then
+             if "${v.effectRange}" ~= "" then ParticleEffectAttach("${v.effectRange}",PATTACH_POINT_FOLLOW,self,0) end
+             sound.Add( {
+                name = "Range", channel = CHAN_STATIC, volume = 1.0, level = 0, pitch = 100, sound = "${v.soundRoar}"
+            } )
+            self.flamedmgrange = 0
+            self.flamedmgUPpos = 0
+
+            timer.Create("GreatMotherRANGE_START"..tostring(self),0.2,10,function()
+                if IsValid(self) then
+                    util.ScreenShake( self:GetPos(), 10, 20, 1, 32000 )
+                    self:EmitSound("${v.soundRoar}", 150, 100, 1)
+                    
+                    self.flamedmgrange = self.flamedmgrange+800
+                    self.flamedmgUPpos = self.flamedmgUPpos-300
+ 
+                    local enemies = ents.FindInSphere( self:GetPos() + self:GetForward()*self.flamedmgrange +self:GetUp()*self.flamedmgUPpos, 5000 )
+                    for M=1, #enemies do
+                        if IsValid(enemies[M]) and ( (enemies[M]:IsNPC() or enemies[M]:IsNextBot() ) and enemies[M]:GetClass() ~= self:GetClass() ) and self:Disposition( enemies[M] ) == 1 then  
+                            if enemies[M]:Health() < 410 and self:EatableENTSizeChecker(enemies[M]) == true then
+                                enemies[M]:Fire( "Kill", "", 0.1 )
+                                net.Start( "NPCKilledNPC" )
+                                net.WriteString( enemies[M]:GetClass() )
+                                net.WriteString( self:GetClass() )
+                                net.WriteString( self:GetClass() )
+                                net.Broadcast()
+                            end
+                            enemies[M]:TakeDamage( ${v.damage}, self, self )
+                            enemies[M]:SetVelocity( self:GetForward() * 4000 +self:GetUp() * 80)           
+                        end
+                        
+                        if enemies[M]:IsPlayer() and GetConVarNumber("ai_ignoreplayers") == 0 then
+                            enemies[M]:TakeDamage( 0.5, self, self )
+                            enemies[M]:SetVelocity( self:GetForward() * 200 +self:GetUp() * 10) 
+                        end
+                    end
+                end
+            end)
+        end
+
+    elseif e == "${v.animSummon}" then
+        if IsValid(self) then
+            self:EmitSound("${v.soundRoar}", 100, 80, 1) 
+            for M=1,3 do
+                local minion = ents.Create(self.Config.SummonClassList[ math.random(1,#self.Config.SummonClassList) ] )
+                if minion ~= NULL then  
+                    minion:SetPos(self:GetPos()+self:GetForward()*math.random(200,500)+ self:GetRight()*math.random(-500,500) +self:GetUp()*math.random(100,200) )
+                    minion:Spawn()
+                    if minion.PlaySequenceAndMove then minion:PlaySequenceAndMove("idle", 1) end
+                    self:DeleteOnRemove(minion)
+                end
+            end
+        end
+    
+    elseif e == "${v.animSuck}" then
+        timer.Create("GreatMotherRANGE_START"..tostring(self),0.05,1,function()
+            if IsValid(self) then
+                util.ScreenShake( self:GetPos(), 10, 20, 1, 5000 )
+                self:EmitSound("${v.soundRoar}", 130, 100, 1)
+                local enemy = self:GetEnemy()
+                if IsValid(self) and IsValid(enemy) then 
+                    self:SetHealth(self:Health()+enemy:Health()) 
+                    if "${v.effectSuck}" ~= "" then util.ParticleTracerEx("${v.effectSuck}",  self:GetPos(), enemy:GetPos(), false, self:EntIndex(), 1) end
+                    enemy:SetPos(self:GetPos())
+                    enemy:Fire( "Kill", "", 0.1 )
+                    net.Start( "NPCKilledNPC" )
+                    net.WriteString( enemy:GetClass() )
+                    net.WriteString( self:GetClass() )
+                    net.WriteString( self:GetClass() )
+                    net.Broadcast()
+                end
+            end
+        end)
+        
+    elseif e == "${v.animEat}" then
+        local enemy = self:GetEnemy()
+        if IsValid(enemy) and (enemy.IsDrGNextbot or enemy:IsNPC()) then
+            if "${v.effectEat}" ~= "" then ParticleEffectAttach("${v.effectEat}", PATTACH_POINT_FOLLOW, self, 0) end
+            enemy:SetPos(self:GetPos() + self:GetForward()*50)
+            enemy:TakeDamage(enemy:GetMaxHealth() * 2, self, self)
+            self:SetHealth(self:Health() + enemy:GetMaxHealth())
+            self:EmitSound("${v.soundHit}", 120, 100, 1)
+        end
+    end
+end
+
+end
+
+-- DO NOT TOUCH --
+if SERVER then
+  AddCSLuaFile("shared.lua")
+end`;
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-anim flex items-center gap-2.5 text-white px-4 py-3 rounded shadow-xl bg-zinc-800 border border-zinc-700`;
+            toast.innerHTML = `<div class="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center"><svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg></div><span class="font-medium text-sm tracking-wide">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function copyCode() {
+            if (DOM.codePreview) {
+                DOM.codePreview.select();
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                showToast("Script copied to clipboard.");
+            }
+        }
+
+        function downloadCode() {
+            if (DOM.codePreview && DOM.filename) {
+                const blob = new Blob([DOM.codePreview.value], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = DOM.filename.innerText;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast(`Exported ${DOM.filename.innerText}`);
+            }
+        }
+
+        window.onload = () => { 
+            setTimeout(() => {
+                const overlay = document.getElementById('introOverlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => overlay.remove(), 700);
+                }
+                showWelcomeScreen(); 
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
